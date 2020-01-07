@@ -84,7 +84,7 @@ class ViewController: UIViewController {
  
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        
         view.backgroundColor = .white
  
         configureText()
@@ -139,19 +139,21 @@ class ViewController: UIViewController {
     }
  
     func addConstraints() {
-        targetStack.apply(constraints: [
-            targetStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            targetStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-        ])
-        
         sliderAndButtonStack.apply(constraints: [
             sliderAndButtonStack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            sliderAndButtonStack.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
+            sliderAndButtonStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            sliderAndButtonStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
+        ])
+        
+        targetStack.apply(constraints: [
+            targetStack.bottomAnchor.constraint(equalTo: sliderAndButtonStack.topAnchor, constant: -60),
+            targetStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
  
         bottomView.apply(constraints: [
-            bottomView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
-            bottomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            bottomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            bottomView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            bottomView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])
     }
    
@@ -178,6 +180,7 @@ class ViewController: UIViewController {
     func generateNewTarget() {
         targetValue = Int.random(in: 1...100)
         targetValueLabel.text = "\(targetValue)"
+        pulseText(element: targetValueLabel)
     }
    
     func nextRound() {
@@ -192,10 +195,12 @@ class ViewController: UIViewController {
    
     func updateScoreValueLabel() {
         scoreValueLabel.text = "\(self.score)"
+        pulseText(element: scoreValueLabel)
     }
    
     func updateRoundValueLabel() {
         roundValueLabel.text = "\(self.round)"
+        pulseText(element: roundValueLabel)
     }
     
     func animatePointsOverScore(points: Int) {
@@ -209,18 +214,29 @@ class ViewController: UIViewController {
             var frame = floatingLabel.frame
             frame.origin.y = frame.origin.y - 40
             floatingLabel.frame = frame
-
             floatingLabel.alpha = 0
         }, completion: { completed in
             floatingLabel.removeFromSuperview()
         })
     }
+    
+    func pulseText(element: UIView) {
+        UIView.animate(withDuration: 0.05, animations: {
+            element.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+        }, completion: { completed in
+            UIView.animate(withDuration: 0.05, animations: {
+                element.transform = CGAffineTransform.identity
+            }, completion: nil)
+        })
+    }
    
     @objc func handleResetButton() {
-        score = 0
-        round = 1
-        updateScoreValueLabel()
-        updateRoundValueLabel()
+        if score != 0 && round != 1 {
+            score = 0
+            round = 1
+            updateScoreValueLabel()
+            updateRoundValueLabel()
+        }
     }
  
 }
