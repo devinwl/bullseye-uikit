@@ -150,8 +150,7 @@ class ViewController: UIViewController {
         ])
  
         bottomView.apply(constraints: [
-            bottomView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            bottomView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            bottomView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
             bottomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
@@ -168,11 +167,12 @@ class ViewController: UIViewController {
             bonus = 0
         }
        
-        let score: Int = 100 - difference + bonus
+        let totalPoints: Int = 100 - difference + bonus
        
-        addToScore(score: score)
+        addToScore(points: totalPoints)
         nextRound()
         generateNewTarget()
+        animatePointsOverScore(points: totalPoints)
     }
    
     func generateNewTarget() {
@@ -185,8 +185,8 @@ class ViewController: UIViewController {
         updateRoundValueLabel()
     }
    
-    func addToScore(score: Int) {
-        self.score += score
+    func addToScore(points: Int) {
+        self.score += points
         updateScoreValueLabel()
     }
    
@@ -196,6 +196,24 @@ class ViewController: UIViewController {
    
     func updateRoundValueLabel() {
         roundValueLabel.text = "\(self.round)"
+    }
+    
+    func animatePointsOverScore(points: Int) {
+        let location = scoreValueLabel.convert(scoreValueLabel.bounds, to: self.view)
+        let floatingLabel = UILabel(frame: location)
+        floatingLabel.text = "+ \(points)"
+        view.addSubview(floatingLabel)
+        floatingLabel.sizeToFit()
+
+        UIView.animate(withDuration: 0.5, animations: {
+            var frame = floatingLabel.frame
+            frame.origin.y = frame.origin.y - 40
+            floatingLabel.frame = frame
+
+            floatingLabel.alpha = 0
+        }, completion: { completed in
+            floatingLabel.removeFromSuperview()
+        })
     }
    
     @objc func handleResetButton() {
