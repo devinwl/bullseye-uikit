@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     
     var targetValue = 0
     var score = 0
-    var round = 1
+    var timer = Timer()
     
     let customView: View = {
         return View(frame: UIScreen.main.bounds)
@@ -34,37 +34,50 @@ class ViewController: UIViewController {
         generateNewTarget()
         
         customView.updateScoreValueLabel(newScore: score)
-        customView.updateRoundValueLabel(round: round)
+        
+        resetTimer()
     }
    
     @objc func handleHitMeButton() {
         let difference = abs(targetValue - Int(customView.getSliderValue()))
+        let multiplier: Double
         let bonus: Int
        
         if difference == 0 {
             bonus = 100
+            multiplier = 3.0
         } else if difference <= 2 {
             bonus = 50
+            multiplier = max(1, timer.fireDate.timeIntervalSinceNow)
         } else {
             bonus = 0
+            multiplier = 1
         }
        
-        let totalPoints: Int = 100 - difference + bonus
+        let startingPoints: Double = max(0, Double(25 - difference))
+        let pointsWithMultiplier: Double = startingPoints * multiplier
+        let totalPoints: Int = Int(pointsWithMultiplier.rounded()) + bonus
        
         addToScore(points: totalPoints)
-        nextRound()
         generateNewTarget()
+        resetTimer()
         
+        customView.resetSlider()
         customView.animatePointsOverScore(points: totalPoints)
     }
     
     @objc func handleResetButton() {
-        if score != 0 && round != 1 {
+        if score != 0 {
             score = 0
-            round = 1
             customView.updateScoreValueLabel(newScore: score)
-            customView.updateRoundValueLabel(round: round)
+            customView.resetSlider()
+            resetTimer()
+            generateNewTarget()
         }
+    }
+    
+    @objc func handleTimerFired() {
+        generateNewTarget()
     }
    
     func generateNewTarget() {
@@ -72,14 +85,13 @@ class ViewController: UIViewController {
         customView.updateTargetValueLabel(newValue: targetValue)
     }
    
-    func nextRound() {
-        round += 1
-        customView.resetSlider()
-        customView.updateRoundValueLabel(round: round)
-    }
-   
     func addToScore(points: Int) {
         self.score += points
         customView.updateScoreValueLabel(newScore: self.score)
+    }
+    
+    func resetTimer() {
+        timer.invalidate()
+        timer = Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(handleTimerFired), userInfo: nil, repeats: true)
     }
 }

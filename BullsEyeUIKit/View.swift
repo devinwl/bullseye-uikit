@@ -13,12 +13,11 @@ final class View: UIView {
     static let minValue: Int = 1
     static let maxValue: Int = 100
 
-    let targetLabel: UILabel = {
+    let targetValueLabel: UILabel = {
         let label = UILabel()
-        label.text = "Get the slider as close as you can to:"
+        label.font = UIFont.systemFont(ofSize: 48)
         return label
     }()
-    let targetValueLabel = UILabel()
 
     lazy var targetStack: UIStackView = {
         let stack = UIStackView()
@@ -70,22 +69,9 @@ final class View: UIView {
     
     let resetButton: UIButton = {
         let button: UIButton = UIButton(type: .system)
-        button.setTitle("Start Over", for: .normal)
+        let arrowCounterClockwiseCircle = UIImage(systemName: "arrow.counterclockwise.circle")
+        button.setImage(arrowCounterClockwiseCircle, for: .normal)
         return button
-    }()
-
-    let roundLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Round:"
-        return label
-    }()
-    
-    let roundValueLabel = UILabel()
-    let roundView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.spacing = 5.0
-        return stack
     }()
 
     let scoreLabel: UILabel = {
@@ -124,7 +110,6 @@ final class View: UIView {
     }
 
     func addSubviews() {
-        targetStack.addArrangedSubview(targetLabel)
         targetStack.addArrangedSubview(targetValueLabel)
         addSubview(targetStack)
 
@@ -142,10 +127,6 @@ final class View: UIView {
         bottomView.addArrangedSubview(scoreView)
         scoreView.addArrangedSubview(scoreLabel)
         scoreView.addArrangedSubview(scoreValueLabel)
-
-        bottomView.addArrangedSubview(roundView)
-        roundView.addArrangedSubview(roundLabel)
-        roundView.addArrangedSubview(roundValueLabel)
     }
 
     func addConstraints() {
@@ -184,36 +165,33 @@ final class View: UIView {
         scoreValueLabel.text = "\(newScore)"
         pulseElement(element: scoreValueLabel)
     }
-    
-    func updateRoundValueLabel(round: Int) {
-        roundValueLabel.text = "\(round)"
-        pulseElement(element: roundValueLabel)
-    }
-    
+
     /** Animation stuff */
     func animatePointsOverScore(points: Int) {
-        let floatingLabel = UILabel()
-        floatingLabel.text = "+ \(points)"
-        floatingLabel.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(floatingLabel)
-        floatingLabel.sizeToFit()
+        if (points > 0) {
+            let floatingLabel = UILabel()
+            floatingLabel.text = "+ \(points)"
+            floatingLabel.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(floatingLabel)
+            floatingLabel.sizeToFit()
 
-        let bottomConstraint = floatingLabel.bottomAnchor.constraint(equalTo: scoreValueLabel.bottomAnchor, constant: -18)
+            let bottomConstraint = floatingLabel.bottomAnchor.constraint(equalTo: scoreValueLabel.bottomAnchor, constant: -18)
 
-        NSLayoutConstraint.activate([
-            bottomConstraint,
-            floatingLabel.trailingAnchor.constraint(equalTo: scoreValueLabel.trailingAnchor)
-        ])
-        layoutIfNeeded()
-        bottomConstraint.constant = -40
+            NSLayoutConstraint.activate([
+                bottomConstraint,
+                floatingLabel.trailingAnchor.constraint(equalTo: scoreValueLabel.trailingAnchor)
+            ])
+            layoutIfNeeded()
+            bottomConstraint.constant = -40
 
-        UIView.animate(withDuration: 0.5, animations: {
-            self.layoutIfNeeded()
+            UIView.animate(withDuration: 0.5, animations: {
+                self.layoutIfNeeded()
 
-            floatingLabel.alpha = 0
-        }, completion: { completed in
-            floatingLabel.removeFromSuperview()
-        })
+                floatingLabel.alpha = 0
+            }, completion: { completed in
+                floatingLabel.removeFromSuperview()
+            })
+        }
     }
     
     func pulseElement(element: UIView) {
