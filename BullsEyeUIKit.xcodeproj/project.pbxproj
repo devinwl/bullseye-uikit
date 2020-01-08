@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		034E1D6F23C5548E00C5D908 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034E1D6E23C5548E00C5D908 /* View.swift */; };
 		0390075123C3B1CB0013FC17 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0390075023C3B1CB0013FC17 /* AppDelegate.swift */; };
 		0390075323C3B1CB0013FC17 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0390075223C3B1CB0013FC17 /* SceneDelegate.swift */; };
 		0390075523C3B1CB0013FC17 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0390075423C3B1CB0013FC17 /* ViewController.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		034E1D6E23C5548E00C5D908 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		0390074D23C3B1CB0013FC17 /* BullsEyeUIKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BullsEyeUIKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0390075023C3B1CB0013FC17 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0390075223C3B1CB0013FC17 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 				0390075B23C3B1CB0013FC17 /* LaunchScreen.storyboard */,
 				0390075E23C3B1CB0013FC17 /* Info.plist */,
 				0390076423C506B80013FC17 /* UIView Autolayout.swift */,
+				034E1D6E23C5548E00C5D908 /* View.swift */,
 			);
 			path = BullsEyeUIKit;
 			sourceTree = "<group>";
@@ -139,6 +142,7 @@
 			files = (
 				0390075523C3B1CB0013FC17 /* ViewController.swift in Sources */,
 				0390075123C3B1CB0013FC17 /* AppDelegate.swift in Sources */,
+				034E1D6F23C5548E00C5D908 /* View.swift in Sources */,
 				0390076523C506B80013FC17 /* UIView Autolayout.swift in Sources */,
 				0390075323C3B1CB0013FC17 /* SceneDelegate.swift in Sources */,
 			);
