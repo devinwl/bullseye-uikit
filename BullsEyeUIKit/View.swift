@@ -12,14 +12,18 @@ final class View: UIView {
 
     static let minValue: Int = 1
     static let maxValue: Int = 100
+    
+    // How much time the user has until the next number is generated
+    static let maxGuessTime: Float = 4.0
 
     let targetValueLabel: UILabel = {
         let label = UILabel()
+        label.text = "0"
         label.font = UIFont.systemFont(ofSize: 48)
         return label
     }()
 
-    lazy var targetStack: UIStackView = {
+    let targetStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 5.0
@@ -94,6 +98,24 @@ final class View: UIView {
         stack.distribution = .equalSpacing
         return stack
     }()
+    
+    lazy var circleLayer: CAShapeLayer = {
+        // I think there is a bug here because the layout has not been fully figured out by the time this closure
+        // is run...
+        self.layoutIfNeeded()
+        let targetValueLabelOrigin = self.convert(targetValueLabel.bounds, from: self.targetStack)
+        
+        // Why do I need + 10 to the y coord?
+        let circlePath = UIBezierPath(arcCenter: CGPoint(x: targetValueLabelOrigin.midX, y: targetValueLabelOrigin.midY + 10), radius: 60, startAngle: CGFloat(-Double.pi / 2), endAngle: CGFloat((Double.pi * 2.0) - Double.pi / 2), clockwise: true)
+
+        // Setup the CAShapeLayer with the path, colors, and line width
+        let cLayer = CAShapeLayer()
+        cLayer.path = circlePath.cgPath
+        cLayer.fillColor = UIColor.clear.cgColor
+        cLayer.strokeColor = UIColor.systemBlue.cgColor
+        cLayer.lineWidth = 20.0;
+        return cLayer
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -102,6 +124,10 @@ final class View: UIView {
         
         addSubviews()
         addConstraints()
+        
+        layer.addSublayer(circleLayer)
+        
+        startCircleCountdown()
     }
 
     @available(*, unavailable)
@@ -202,5 +228,15 @@ final class View: UIView {
                 element.transform = CGAffineTransform.identity
             }, completion: nil)
         })
+    }
+    
+    func startCircleCountdown() {
+        layer.removeAllAnimations()
+        let animation = CABasicAnimation(keyPath: "strokeEnd")
+        animation.fromValue = 1.0
+        animation.toValue = 0.0
+        animation.duration = 3.0
+        animation.repeatCount = Float.infinity
+        circleLayer.add(animation, forKey: nil)
     }
 }

@@ -73,6 +73,7 @@ class ViewController: UIViewController {
             customView.resetSlider()
             resetTimer()
             generateNewTarget()
+            customView.startCircleCountdown()
         }
     }
     
@@ -83,11 +84,14 @@ class ViewController: UIViewController {
     func generateNewTarget() {
         targetValue = Int.random(in: 1...100)
         customView.updateTargetValueLabel(newValue: targetValue)
+        customView.startCircleCountdown()
     }
    
     func addToScore(points: Int) {
-        self.score += points
-        customView.updateScoreValueLabel(newScore: self.score)
+        if points > 0 {
+            self.score += points
+            customView.updateScoreValueLabel(newScore: self.score)
+        }
     }
     
     func resetTimer() {
