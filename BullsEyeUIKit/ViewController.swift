@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     var targetValue = 0
     var score = 0
     var timer = Timer()
+    let maxGuessTime = 4.0
     
     let customView: View = {
         return View(frame: UIScreen.main.bounds)
@@ -96,6 +97,6 @@ class ViewController: UIViewController {
     
     func resetTimer() {
         timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(handleTimerFired), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: maxGuessTime, target: self, selector: #selector(handleTimerFired), userInfo: nil, repeats: true)
     }
 }

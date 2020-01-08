@@ -13,13 +13,14 @@ final class View: UIView {
     static let minValue: Int = 1
     static let maxValue: Int = 100
     
-    // How much time the user has until the next number is generated
-    static let maxGuessTime: Float = 4.0
+    // TODO: This should be set from the ViewController
+    let maxGuessTime: Float = 4.0
 
     let targetValueLabel: UILabel = {
         let label = UILabel()
         label.text = "0"
         label.font = UIFont.systemFont(ofSize: 48)
+        label.sizeToFit()
         return label
     }()
 
@@ -99,22 +100,33 @@ final class View: UIView {
         return stack
     }()
     
-    lazy var circleLayer: CAShapeLayer = {
-        // I think there is a bug here because the layout has not been fully figured out by the time this closure
-        // is run...
-        self.layoutIfNeeded()
-        let targetValueLabelOrigin = self.convert(targetValueLabel.bounds, from: self.targetStack)
+    static let circleRadius: CGFloat = 60.0
+    static let circleLineWidth: Double = 20.0
+    static let circleViewWidth = Double(circleRadius * 2) + circleLineWidth
+    static let circleViewHeight = circleViewWidth
+    
+    var circleLayer = CAShapeLayer()
+    
+    lazy var countdownCircle: UIView = {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: Self.circleViewWidth, height: Self.circleViewHeight))
         
-        // Why do I need + 10 to the y coord?
-        let circlePath = UIBezierPath(arcCenter: CGPoint(x: targetValueLabelOrigin.midX, y: targetValueLabelOrigin.midY + 10), radius: 60, startAngle: CGFloat(-Double.pi / 2), endAngle: CGFloat((Double.pi * 2.0) - Double.pi / 2), clockwise: true)
+        let circlePath = UIBezierPath(arcCenter: CGPoint(x: Self.circleViewWidth / 2, y: Self.circleViewHeight / 2), radius: Self.circleRadius, startAngle: CGFloat(-Double.pi / 2), endAngle: CGFloat((Double.pi * 2.0) - Double.pi / 2), clockwise: true)
 
-        // Setup the CAShapeLayer with the path, colors, and line width
-        let cLayer = CAShapeLayer()
-        cLayer.path = circlePath.cgPath
-        cLayer.fillColor = UIColor.clear.cgColor
-        cLayer.strokeColor = UIColor.systemBlue.cgColor
-        cLayer.lineWidth = 20.0;
-        return cLayer
+        circleLayer.path = circlePath.cgPath
+        circleLayer.fillColor = UIColor.clear.cgColor
+        circleLayer.strokeColor = UIColor.systemBlue.cgColor
+        circleLayer.lineWidth = 20.0;
+
+        view.layer.addSublayer(circleLayer)
+        
+        view.addSubview(targetValueLabel)
+        
+        targetValueLabel.apply(constraints: [
+            targetValueLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            targetValueLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        
+        return view
     }()
 
     override init(frame: CGRect) {
@@ -125,8 +137,6 @@ final class View: UIView {
         addSubviews()
         addConstraints()
         
-        layer.addSublayer(circleLayer)
-        
         startCircleCountdown()
     }
 
@@ -136,9 +146,6 @@ final class View: UIView {
     }
 
     func addSubviews() {
-        targetStack.addArrangedSubview(targetValueLabel)
-        addSubview(targetStack)
-
         sliderStack.addArrangedSubview(sliderMinLabel)
         sliderStack.addArrangedSubview(slider)
         sliderStack.addArrangedSubview(sliderMaxLabel)
@@ -153,6 +160,8 @@ final class View: UIView {
         bottomView.addArrangedSubview(scoreView)
         scoreView.addArrangedSubview(scoreLabel)
         scoreView.addArrangedSubview(scoreValueLabel)
+        
+        addSubview(countdownCircle)
     }
 
     func addConstraints() {
@@ -162,10 +171,12 @@ final class View: UIView {
            sliderAndButtonStack.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20)
        ])
    
-       targetStack.apply(constraints: [
-           targetStack.bottomAnchor.constraint(equalTo: sliderAndButtonStack.topAnchor, constant: -60),
-           targetStack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-       ])
+        countdownCircle.apply(constraints: [
+            countdownCircle.bottomAnchor.constraint(equalTo: sliderAndButtonStack.topAnchor, constant: -60),
+            countdownCircle.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
+            countdownCircle.widthAnchor.constraint(equalToConstant: CGFloat(Self.circleViewWidth)),
+            countdownCircle.heightAnchor.constraint(equalToConstant: CGFloat(Self.circleViewHeight))
+        ])
 
        bottomView.apply(constraints: [
            bottomView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20),
@@ -231,11 +242,11 @@ final class View: UIView {
     }
     
     func startCircleCountdown() {
-        layer.removeAllAnimations()
+        countdownCircle.layer.removeAllAnimations()
         let animation = CABasicAnimation(keyPath: "strokeEnd")
         animation.fromValue = 1.0
         animation.toValue = 0.0
-        animation.duration = 3.0
+        animation.duration = CFTimeInterval(maxGuessTime)
         animation.repeatCount = Float.infinity
         circleLayer.add(animation, forKey: nil)
     }
