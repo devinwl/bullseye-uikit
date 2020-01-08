@@ -13,7 +13,11 @@ final class View: UIView {
     static let minValue: Int = 1
     static let maxValue: Int = 100
 
-    let targetLabel = UILabel()
+    let targetLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Get the slider as close as you can to:"
+        return label
+    }()
     let targetValueLabel = UILabel()
 
     lazy var targetStack: UIStackView = {
@@ -33,11 +37,15 @@ final class View: UIView {
 
     let sliderMinLabel: UILabel = {
         let label = UILabel()
-
+        label.text = "\(minValue)"
         return label
     }()
 
-    let sliderMaxLabel = UILabel()
+    let sliderMaxLabel: UILabel = {
+        let label = UILabel()
+        label.text = "\(maxValue)"
+        return label
+    }()
 
     lazy var slider: UISlider = {
         let slider = UISlider()
@@ -54,10 +62,24 @@ final class View: UIView {
         return stack
     }()
 
-    let hitMeButton = UIButton(type: .system)
-    let resetButton = UIButton(type: .system)
+    let hitMeButton: UIButton = {
+        let button: UIButton = UIButton(type: .system)
+        button.setTitle("Hit Me!", for: .normal)
+        return button
+    }()
+    
+    let resetButton: UIButton = {
+        let button: UIButton = UIButton(type: .system)
+        button.setTitle("Start Over", for: .normal)
+        return button
+    }()
 
-    let roundLabel = UILabel()
+    let roundLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Round:"
+        return label
+    }()
+    
     let roundValueLabel = UILabel()
     let roundView: UIStackView = {
         let stack = UIStackView()
@@ -66,7 +88,12 @@ final class View: UIView {
         return stack
     }()
 
-    let scoreLabel = UILabel()
+    let scoreLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Score:"
+        return label
+    }()
+    
     let scoreValueLabel = UILabel()
     let scoreView: UIStackView = {
         let stack = UIStackView()
@@ -85,10 +112,8 @@ final class View: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        backgroundColor = .white
-
-        configureText()
-
+        backgroundColor = .systemBackground
+        
         addSubviews()
         addConstraints()
     }
@@ -123,35 +148,81 @@ final class View: UIView {
         roundView.addArrangedSubview(roundValueLabel)
     }
 
-    func configureText() {
-        targetLabel.text = "Get the slider as close as you can to:"
-        
-        sliderMinLabel.text = "\(Self.minValue)"
-        sliderMaxLabel.text = "\(Self.maxValue)"
-        
-        hitMeButton.setTitle("Hit Me!", for: .normal)
-        resetButton.setTitle("Start Over", for: .normal)
-        
-        scoreLabel.text = "Score:"
-        roundLabel.text = "Round:"
-    }
-
     func addConstraints() {
         sliderAndButtonStack.apply(constraints: [
-       sliderAndButtonStack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-       sliderAndButtonStack.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
-       sliderAndButtonStack.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20)
-   ])
+           sliderAndButtonStack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
+           sliderAndButtonStack.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
+           sliderAndButtonStack.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20)
+       ])
    
-   targetStack.apply(constraints: [
-       targetStack.bottomAnchor.constraint(equalTo: sliderAndButtonStack.topAnchor, constant: -60),
-       targetStack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-   ])
+       targetStack.apply(constraints: [
+           targetStack.bottomAnchor.constraint(equalTo: sliderAndButtonStack.topAnchor, constant: -60),
+           targetStack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
+       ])
 
-   bottomView.apply(constraints: [
-       bottomView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20),
-       bottomView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
-       bottomView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20)
-   ])
+       bottomView.apply(constraints: [
+           bottomView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20),
+           bottomView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
+           bottomView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20)
+       ])
+    }
+    
+    func resetSlider() {
+        slider.value = Float(Int(Self.minValue + Self.maxValue / 2))
+    }
+    
+    func getSliderValue() -> Float {
+        slider.value.rounded()
+    }
+    
+    func updateTargetValueLabel(newValue: Int) {
+        targetValueLabel.text = "\(newValue)"
+        pulseElement(element: targetValueLabel)
+    }
+    
+    func updateScoreValueLabel(newScore: Int) {
+        scoreValueLabel.text = "\(newScore)"
+        pulseElement(element: scoreValueLabel)
+    }
+    
+    func updateRoundValueLabel(round: Int) {
+        roundValueLabel.text = "\(round)"
+        pulseElement(element: roundValueLabel)
+    }
+    
+    /** Animation stuff */
+    func animatePointsOverScore(points: Int) {
+        let floatingLabel = UILabel()
+        floatingLabel.text = "+ \(points)"
+        floatingLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(floatingLabel)
+        floatingLabel.sizeToFit()
+
+        let bottomConstraint = floatingLabel.bottomAnchor.constraint(equalTo: scoreValueLabel.bottomAnchor, constant: -18)
+
+        NSLayoutConstraint.activate([
+            bottomConstraint,
+            floatingLabel.trailingAnchor.constraint(equalTo: scoreValueLabel.trailingAnchor)
+        ])
+        layoutIfNeeded()
+        bottomConstraint.constant = -40
+
+        UIView.animate(withDuration: 0.5, animations: {
+            self.layoutIfNeeded()
+
+            floatingLabel.alpha = 0
+        }, completion: { completed in
+            floatingLabel.removeFromSuperview()
+        })
+    }
+    
+    func pulseElement(element: UIView) {
+        UIView.animate(withDuration: 0.05, animations: {
+            element.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+        }, completion: { completed in
+            UIView.animate(withDuration: 0.05, animations: {
+                element.transform = CGAffineTransform.identity
+            }, completion: nil)
+        })
     }
 }

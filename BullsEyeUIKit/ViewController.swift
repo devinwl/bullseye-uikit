@@ -32,12 +32,13 @@ class ViewController: UIViewController {
         customView.resetButton.addTarget(self, action: #selector(handleResetButton), for: UIControl.Event.touchUpInside)
  
         generateNewTarget()
-        updateScoreValueLabel()
-        updateRoundValueLabel()
+        
+        customView.updateScoreValueLabel(newScore: score)
+        customView.updateRoundValueLabel(round: round)
     }
    
     @objc func handleHitMeButton() {
-        let difference = abs(targetValue - Int(customView.slider.value.rounded()))
+        let difference = abs(targetValue - Int(customView.getSliderValue()))
         let bonus: Int
        
         if difference == 0 {
@@ -53,70 +54,32 @@ class ViewController: UIViewController {
         addToScore(points: totalPoints)
         nextRound()
         generateNewTarget()
-        animatePointsOverScore(points: totalPoints)
-    }
-   
-    func generateNewTarget() {
-        targetValue = Int.random(in: 1...100)
-        customView.targetValueLabel.text = "\(targetValue)"
-        pulseText(element: customView.targetValueLabel)
-    }
-   
-    func nextRound() {
-        round += 1
-        customView.slider.value = Float(Int(minValue + maxValue / 2))
-        updateRoundValueLabel()
-    }
-   
-    func addToScore(points: Int) {
-        self.score += points
-        updateScoreValueLabel()
-    }
-   
-    func updateScoreValueLabel() {
-        customView.scoreValueLabel.text = "\(self.score)"
-        pulseText(element: customView.scoreValueLabel)
-    }
-   
-    func updateRoundValueLabel() {
-        customView.roundValueLabel.text = "\(self.round)"
-        pulseText(element: customView.roundValueLabel)
+        
+        customView.animatePointsOverScore(points: totalPoints)
     }
     
-    func animatePointsOverScore(points: Int) {
-        let location = customView.scoreValueLabel.convert(customView.scoreValueLabel.bounds, to: self.view)
-        let floatingLabel = UILabel(frame: location)
-        floatingLabel.text = "+ \(points)"
-        view.addSubview(floatingLabel)
-        floatingLabel.sizeToFit()
-
-        UIView.animate(withDuration: 0.5, animations: {
-            var frame = floatingLabel.frame
-            frame.origin.y = frame.origin.y - 40
-            floatingLabel.frame = frame
-            floatingLabel.alpha = 0
-        }, completion: { completed in
-            floatingLabel.removeFromSuperview()
-        })
-    }
-    
-    func pulseText(element: UIView) {
-        UIView.animate(withDuration: 0.05, animations: {
-            element.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-        }, completion: { completed in
-            UIView.animate(withDuration: 0.05, animations: {
-                element.transform = CGAffineTransform.identity
-            }, completion: nil)
-        })
-    }
-   
     @objc func handleResetButton() {
         if score != 0 && round != 1 {
             score = 0
             round = 1
-            updateScoreValueLabel()
-            updateRoundValueLabel()
+            customView.updateScoreValueLabel(newScore: score)
+            customView.updateRoundValueLabel(round: round)
         }
     }
- 
+   
+    func generateNewTarget() {
+        targetValue = Int.random(in: 1...100)
+        customView.updateTargetValueLabel(newValue: targetValue)
+    }
+   
+    func nextRound() {
+        round += 1
+        customView.resetSlider()
+        customView.updateRoundValueLabel(round: round)
+    }
+   
+    func addToScore(points: Int) {
+        self.score += points
+        customView.updateScoreValueLabel(newScore: self.score)
+    }
 }
