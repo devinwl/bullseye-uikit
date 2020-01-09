@@ -8,6 +8,15 @@
 
 import UIKit
 
+extension NSLayoutConstraint {
+    
+    func priority(_ priority: UILayoutPriority) -> NSLayoutConstraint {
+        self.priority = priority
+        return self
+    }
+    
+}
+
 final class View: UIView {
 
     static let minValue: Int = 1
@@ -109,7 +118,7 @@ final class View: UIView {
     
     lazy var countdownCircle: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: Self.circleViewWidth, height: Self.circleViewHeight))
-        
+                
         let circlePath = UIBezierPath(arcCenter: CGPoint(x: Self.circleViewWidth / 2, y: Self.circleViewHeight / 2), radius: Self.circleRadius, startAngle: CGFloat(-Double.pi / 2), endAngle: CGFloat((Double.pi * 2.0) - Double.pi / 2), clockwise: true)
 
         circleLayer.path = circlePath.cgPath
@@ -166,7 +175,7 @@ final class View: UIView {
 
     func addConstraints() {
         sliderAndButtonStack.apply(constraints: [
-           sliderAndButtonStack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
+            sliderAndButtonStack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).priority(.defaultHigh),
            sliderAndButtonStack.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
            sliderAndButtonStack.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20)
        ])
@@ -175,7 +184,8 @@ final class View: UIView {
             countdownCircle.bottomAnchor.constraint(equalTo: sliderAndButtonStack.topAnchor, constant: -60),
             countdownCircle.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
             countdownCircle.widthAnchor.constraint(equalToConstant: CGFloat(Self.circleViewWidth)),
-            countdownCircle.heightAnchor.constraint(equalToConstant: CGFloat(Self.circleViewHeight))
+            countdownCircle.heightAnchor.constraint(equalToConstant: CGFloat(Self.circleViewHeight)),
+            countdownCircle.topAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.topAnchor, constant: 20)
         ])
 
        bottomView.apply(constraints: [
